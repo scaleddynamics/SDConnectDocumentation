@@ -1,0 +1,236 @@
+FORMAT: 1A
+HOST: http://polls.apiblueprint.org/
+
+# SDConnect
+
+
+## User [/user]
+
+### Create a new User [POST]
+
+Creates a new user in SD_Connect
+
+    + Parameters
+        + username       (required, string(64))
+        + password       (required, string(6-72))
+        + firstName      (required, string(35))
+        + lastName       (required, string(35))
+        + email          (required, string(254))
+        + phone          (required, string(15))
+        + address1       (optional, string(40))
+        + address2       (optional, string(40))
+        + zip            (optional, zipcode)
+
++ Request (application/json)
+
+    + Body
+        
+            {
+                "username":     "imjustinbraun",
+                "password":     "password",
+                "firstName":    "Justin",
+                "lastName":     "Braun",
+                "email":        "justin.braun@scaleddynamics.com",
+                "phone":        "312.123.4567",
+                "address1":     "1600 Pennsylvania Ave NW",
+                "zip":          "20500"
+            }
+
++ Response 201 (application/json)
+
++ Response 400 (application/json)
+
+    + Body
+    
+            {
+              "code": 3,
+              "message": "REQUIRED_FIELD_MISSING",
+              "missingFields": [
+                "firstName"
+              ]
+            }
+
+## User Authentication [/user/{username}/authenticate]
+
+### Authenticate [POST]
+
+Authenticates an existing user
+
+    + Parameters
+        +password (required, string(64))
+        
++ Request (application/json)
+
+    + Body
+        
+            {
+                "password": "password"
+            }
+
++ Response 200 (application/json)
+
++ Response 401 (application/json)
+
+## Password Reset [/user/{username}/authenticate/recover]
+
+### Recover a lost password [GET]
+
+Attempts to recover a lost password by sending an email to the requested user. If the user does not exist, an email will not be sent, however no indication of the username's existance will be given in the response.
+
++ Response 200
+
+## User Administration [/user/me]
+
+### Change my contact information [PUT]
+
+    + Parameters
+        + username       (optional, string(64))
+        + password       (optional, string(6-72))
+        + firstName      (optional, string(35))
+        + lastName       (optional, string(35))
+        + email          (optional, string(254))
+        + address1       (optional, string(40))
+        + address2       (optional, string(40))
+        + zip            (optional, zipcode)
+
++ Request (application/json)
+
+    + Body
+        
+            {
+                "firstName":    "Ricky",
+                "lastName":     "Grade10",
+            }
+            
++ Response 200
+
+### Get my contact information [GET]
+
+Retrieves a user's basic information
+
++ Response 200 (application/json)
+
+    + Body
+    
+            {
+                "username":     "imjustinbraun",
+                "password":     "password",
+                "firstName":    "Justin",
+                "lastName":     "Braun",
+                "email":        "justin.braun@scaleddynamics.com",
+                "address1":     "1600 Pennsylvania Ave NW",
+                "zip":          "20500"
+            }
+            
++ Response 401
+
+### Deactivate a user [DELETE]
+
++ Response 204
+
+## Adapter Credentials [/user/me/adapter]
+
+### Create Adapter Credentials [POST]
+
+    + Parameters
+        +adapterType            (required, enum)
+            +CTS
+        +adaptercredentials     (required, JSON array)
+        
++ Request (application/json)
+
+    + Body
+        
+            {
+                "adapterType":  "CTS",
+                "adapterCredentials":
+                    [
+                        "username":     "jbraun",
+                        "password":     "password",
+                        "firm":         "CTSDev",
+                        "type":         "SIM"
+                    ]
+            }
+            
++ Response 201 (application/json)
+
+### Retrive Adapter Credentials [PUT /user/me/adapter/{adapterType}]
+
+    + Parameters
+        + adapterType
+
++ Response 200 (application/json)
+
+    + Body
+            
+            {
+                "username":     "jbraun",
+                "password":     "password",
+                "firm":         "CTSDev",
+                "type":         "SIM",
+                "appName":      "T4Example",
+                "appLicense":   "D63492EC-4549-43F5-884B-AB28EA83F55E"
+            }
+
+## My Alerts [/user/me/alert]
+
+### Create a new alert [POST]
+
+Creates an alert. Alert message will be sent as email subject and in the body of SMS messages, errorText in the body of an email and/or support ticket.
+
+    + Parameters
+        + type                  (required, enum, JSON Array)
+            +SMS
+            +email
+            +supportTicket
+        + severity              (required, enum)
+            +notice
+            +warning
+            +error
+            +emergency
+        + message               (required, string(140))
+        + errorText             (optional, text/blob)
+
++ Request (application/json)
+
+    + Body
+        
+            {
+                "type":     [
+                                "SMS",
+                                "email"
+                            ],
+                "severity": "error",
+                "message":  "SD Gatekeeper Unhandled Exception.",
+                "errorText": "Stack Trace ..."
+            }
+
++ Response 201 (application/json)
+
+    + Body 
+            
+            {
+                "errorId": 10568
+            }
+
+
+### View an alert [GET /user/me/alert/{alertId}]
+
++ Request (application/json)
+
++ Response 200 (application/json)
+
+    + Body
+        
+            {
+                "type":     [
+                                "SMS",
+                                "email"
+                            ],
+                "severity": "error",
+                "message":  "SD Gatekeeper Unhandled Exception.",
+                "errorText": "Stack Trace ..."
+            }
+            
+
+            
